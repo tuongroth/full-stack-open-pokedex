@@ -1,17 +1,20 @@
 name: Hello World
 
-on: 
-  push: 
-    branches: 
+on:
+  push:
+    branches:
       - main
 
 jobs:
-  hello:
+  say_hello:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Say Hello
+      - name: Print Hello World
         run: echo "Hello World!"
+
+      - name: Print Date
+        run: date
+
+      - name: List Directory Contents
+        run: ls -l
+
