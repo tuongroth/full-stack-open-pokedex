@@ -1,37 +1,32 @@
-name: Deployment pipeline
+name: Deploy to Fly.io
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust if you use a different branch
 
 jobs:
-  simple_deployment_pipeline:
-    runs-on: ubuntu-20.04
-    
-    steps:
-      # Step 1: Checkout the code
-      - uses: actions/checkout@v4
-      
-      # Step 2: Set up Node.js environment
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+  deploy:
+    runs-on: ubuntu-latest
 
-      # Step 3: Install dependencies
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Use your desired Node.js version
+
       - name: Install dependencies
         run: npm install
-      # Step 4: Run ESLint (linting)
-      - name: Run linting
-        run: npm run eslint || echo "Linting failed, but continuing..."
-        continue-on-error: true # Allow the workflow to proceed even if linting fails
 
-  
-      
-      # Step 5: Build the application
       - name: Build the application
-        run: npm run build
+        run: npm run build  # Create a production build
 
-      # Step 6: Run tests
-      - name: Run tests
-        run: npm test
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # Use the secret
+        run: |
+          flyctl deploy --config fly.toml --remote-only
+
