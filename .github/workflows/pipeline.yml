@@ -14,14 +14,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Install flyctl
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'  # Specify your desired Node.js version
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true  # Allow insecure Node.js version
+
+      # Step 3: Install flyctl
       - name: Install flyctl
         run: |
           curl -L https://fly.io/install.sh | sh
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
-      # Step 3: Deploy to Fly.io
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: npm install  # Ensure dependencies are installed
+
+      # Step 5: Build the application
+      - name: Build the application
+        run: npm run build  # Adjust if your build script is different
+
+      # Step 6: Deploy to Fly.io
       - name: Deploy to Fly.io
         run: flyctl deploy --config fly.toml --remote-only
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # Ensure you have this secret set up
+          FLY_API_TOKEN: 'your_fly_api_token_here'  # Replace with your actual token
