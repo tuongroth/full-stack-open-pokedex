@@ -1,6 +1,2 @@
-- name: Set up SSH key
-  run: |
-    mkdir -p ~/.ssh
-    echo "${{ secrets.FLY_SSH_KEY }}" > ~/.ssh/id_rsa
-    chmod 600 ~/.ssh/id_rsa
-    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+- name: Test SSH connection to GitHub
+  run: ssh -T git@github.com
