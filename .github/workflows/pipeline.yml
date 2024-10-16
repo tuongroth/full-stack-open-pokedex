@@ -8,16 +8,30 @@ on:
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-20.04
-    steps:
-      # Step to check out the repository
-      - uses: actions/checkout@v4
 
-      # Step to set up Node.js version 20
-      - uses: actions/setup-node@v4
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      # Step to install dependencies using npm
+          
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
-e
+
+      # Step 4: Run linting
+      - name: Run ESLint
+        run: npm run eslint
+
+      # Step 5: Build the application
+      - name: Build the application
+        run: npm run build
+
+      # Step 6: Run tests
+      - name: Run tests
+        run: npm test
