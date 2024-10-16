@@ -36,8 +36,14 @@ jobs:
       - name: Build the application
         run: npm run build  # Adjust if your build script is different
 
-      # Step 6: Deploy to Fly.io
+      # Step 6: Set up SSH Key
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.FLY_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      # Step 7: Deploy to Fly.io
       - name: Deploy to Fly.io
-        run: flyctl deploy --config fly.toml --remote-only
+        run: flyctl deploy --app full-stack-open-pokedex-morning-wind-9529 --config fly.toml --remote-only
         env:
-          FLY_API_TOKEN: 'your_fly_api_token_here'  # Replace with your actual token
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # Make sure to add your Fly API token as a secret as well
