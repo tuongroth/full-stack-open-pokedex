@@ -21,6 +21,10 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
+      # Step 4: Run ESLint (linting)
+      - name: Run linting
+        run: npm run eslint || echo "Linting failed, but continuing..."
+        continue-on-error: true # Allow the workflow to proceed even if linting fails
 
   
       
