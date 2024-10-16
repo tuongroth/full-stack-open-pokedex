@@ -22,11 +22,7 @@ jobs:
         env:
           ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true  # Allow insecure Node.js version
 
-      # Step 3: Install flyctl
-      - name: Install flyctl
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
+      
 
       # Step 4: Install dependencies
       - name: Install dependencies
