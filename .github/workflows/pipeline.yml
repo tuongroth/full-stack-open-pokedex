@@ -36,8 +36,4 @@ jobs:
       - name: Build the application
         run: npm run build  # Adjust if your build script is different
 
-      # Step 6: Deploy to Fly.io
-      - name: Deploy to Fly.io
-        run: flyctl deploy --config fly.toml --remote-only
-        env:
-          FLY_API_TOKEN: 'FlyV1 fm2_lJPECAAAAAAAAtZjxBDvhtabGnOeYnKkC9YZ+nzPwrVodHRwczovL2FwaS5mbHkuaW8vdjGWAJLOAAvojR8Lk7lodHRwczovL2FwaS5mbHkuaW8vYWFhL3YxxDwJ4QZi0gGEASJkw1EbjyHc3aFXhMrtvcRBv3lfkQe1Hr878nxKGth1gH6vEXAS73iUJqkEAnoGdmCC2gHETi1aR4pM5kmC6EWNpXDKtjVRiLa9FvanlAzAWDQIRtfFSS3qzHcGgD0k7WDTHkr6Lv7Go4wgEz40O61x1g/WxOGQpHgbL6W9t9UgrVnuAA2SlAORgc4AQntkHwWRgqdidWlsZGVyH6J3Zx8BxCAiXna831ZFreqhqyuLg9Ce6vZfcyRK1BRx+8evsLuOfg==,fm2_lJPETi1aR4pM5kmC6EWNpXDKtjVRiLa9FvanlAzAWDQIRtfFSS3qzHcGgD0k7WDTHkr6Lv7Go4wgEz40O61x1g/WxOGQpHgbL6W9t9UgrVnuAMQQido7LzgIGGLVBfY7ZrqXZ8O5aHR0cHM6Ly9hcGkuZmx5LmlvL2FhYS92MZgEks5nD+kYzwAAAAEjCAc2F84AC5MiCpHOAAuTIgzEEID/gYiGmQAv/umWKq6JcfHEICBJzs0YXA7qWO24JH507Ol4a9cJO1DluqABmehsFW1Z'  # Replace with your actual token
+     
