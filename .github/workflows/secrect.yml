@@ -1,2 +1,35 @@
-- name: Test SSH connection to GitHub
-  run: ssh -T git@github.com
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Runs the workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Runs the workflow on pull requests targeting the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Add your build steps here
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  deploy:
+    # Only run deployment if the event is a 'push' and it's happening on the 'main' branch
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      
