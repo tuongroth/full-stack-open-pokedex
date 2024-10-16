@@ -39,3 +39,4 @@ jobs:
         with:
           default_bump: patch
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.skip_check.outputs.skip == 'false' }}
+
