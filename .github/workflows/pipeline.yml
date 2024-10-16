@@ -1,32 +1,17 @@
-name: Deploy to Fly.io
-
+name: Fly Deploy
 on:
   push:
     branches:
-      - main  # Adjust if you use a different branch
-
+      - master    # change to main if needed
 jobs:
   deploy:
+    name: Deploy app
     runs-on: ubuntu-latest
-
+    concurrency: deploy-group    # optional: ensure only one action runs at a time
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'  # Use your desired Node.js version
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build the application
-        run: npm run build  # Create a production build
-
-      - name: Deploy to Fly.io
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # Use the secret
-        run: |
-          flyctl deploy --config fly.toml --remote-only
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
