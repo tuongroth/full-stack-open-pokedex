@@ -1,44 +1,60 @@
-name: Deployment pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
   pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - synchronize
+    branches: [main]
 
 jobs:
-  simple_deployment_pipeline:
-    runs-on: ubuntu-20.04
+  test_and_lint:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Run tests
+      # Backend Tests
+      - name: Set up Node.js for backend
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install backend dependencies
         run: |
-          echo "Running tests..."
-          # Add testing commands here
-
-      - name: Deploy to production
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cd backend
+          npm install
+      - name: Run backend tests
         run: |
-          echo "Deploying application..."
-          # Add your deployment commands here
+          cd backend
+          npm test
 
-  tag_release:
-    needs: [simple_deployment_pipeline]
-    runs-on: ubuntu-20.04
+      # Frontend Tests
+      - name: Set up Node.js for frontend
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test
+
+  deploy:
+    needs: [test_and_lint]
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@1.64.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BUMP: patch
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      # Deploy Backend
+      - name: Deploy Backend
+        run: |
+          echo "Deploying backend..."
+          # Add backend deployment script here
+
+      # Deploy Frontend
+      - name: Deploy Frontend
+        run: |
+          echo "Deploying frontend..."
+          # Add frontend deployment script here
