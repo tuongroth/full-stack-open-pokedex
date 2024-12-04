@@ -1,15 +1,22 @@
-app = "part3-notes-backend-part4-8"
-primary_region = "sfo"
+name: CI/CD Workflow
 
-[http_service]
-auto_start_machines = true
-auto_stop_machines = true
-force_https = true
-internal_port = 3_001
-min_machines_running = 0
-processes = [ "app" ]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-[[vm]]
-cpu_kind = "shared"
-cpus = 1
-memory = "1gb"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to production
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: |
+          echo "Deploying application..."
+          # Your actual deployment commands here
