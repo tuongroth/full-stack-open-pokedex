@@ -1,4 +1,4 @@
-name: Deploy to Fly.io
+name: Deployment pipeline
 
 on:
   push:
@@ -6,34 +6,38 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
+  simple_deployment_pipeline:
+    runs-on: ubuntu-20.04
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js
+      # Set up Node.js (if not already set up)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Specify your desired Node.js version
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true  # Allow insecure Node.js version
+          node-version: '16'  # Choose the appropriate Node.js version
 
-      # Step 3: Install flyctl
-      - name: Install flyctl
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
-
-      # Step 4: Install dependencies
+      # Install dependencies
       - name: Install dependencies
-        run: npm install  # Ensure dependencies are installed
+        run: npm install
 
-      # Step 5: Build the application
-      - name: Build the application
-        run: npm run build  # Adjust if your build script is different
+      # Build the app (if needed, add a build step)
+      - name: Build the app
+        run: npm run build
 
-     
+      # Start the app in production mode
+      - name: Start the app
+        run: npm run start-prod &
+        
+      # Wait for the server to be available
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:5000
+
+      # E2E tests
+      - name: E2E tests
+        uses: cypress-io/github-action@v5
+        with:
+          command: npm run test:e2e
+          start: npm run start-prod
+          wait-on: http://localhost:5000
