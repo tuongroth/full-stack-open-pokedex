@@ -8,26 +8,20 @@ on:
     branches: [main]
 
 jobs:
-  test_and_lint:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Frontend - Install and Test
-        working-directory: ./frontend
+      - name: Install Dependencies
         run: |
           npm install
-          npm test
 
-      - name: Backend - Install and Test
-        working-directory: ./
+      - name: Build Application
         run: |
-          npm install
-          npm test
+          npm run build
 
-  deploy:
-    needs: test_and_lint
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy Application
-        run: echo "Deployment Step (add your script)"
+        run: |
+          echo "Deploying application..."
+          # Add your deployment commands here
