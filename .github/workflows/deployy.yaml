@@ -1,4 +1,4 @@
-name: Deployment pipeline
+name: Deployment Pipeline with Notifications
 
 on:
   push:
@@ -12,33 +12,52 @@ on:
       - synchronize
 
 jobs:
-  simple_deployment_pipeline:
+  build_and_deploy:
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm install
       - name: Run tests
-        run: |
-          echo "Running tests..."
-          # Add testing commands here
-
+        run: npm test
       - name: Deploy to production
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '#skip') }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
           echo "Deploying application..."
-          # Add your deployment commands here
+          # Deployment commands here
 
-  tag_release:
-    needs: [simple_deployment_pipeline]
+  notify:
+    needs: build_and_deploy
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '#skip') }}
-        uses: anothrNick/github-tag-action@1.64.0
+      - name: Send Discord success notification
+        if: ${{ success() }}
+        uses: peter-evans/discord-webhook-notify@v1.2
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            :tada: **Deployment Successful!**
+            The latest version has been successfully deployed to production.
+            Commit: `${{ github.sha }}`
+            Branch: `${{ github.ref }}`
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BUMP: patch
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Discord failure notification
+        if: ${{ failure() }}
+        uses: peter-evans/discord-webhook-notify@v1.2
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            :x: **Deployment Failed!**
+            Something went wrong during the deployment process.
+            Commit: `${{ github.sha }}`
+            Error message: `${{ job.status }}`
+            Please review the logs to debug the issue.
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
