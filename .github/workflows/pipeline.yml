@@ -30,7 +30,4 @@ jobs:
         
     
 
-    - name: View logs
-      run: |
-        flyctl logs --follow  # Follow logs to monitor the deployment process
-
+   
