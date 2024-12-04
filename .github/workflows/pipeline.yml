@@ -1,39 +1,40 @@
-name: Deployment pipeline
+name: Deploy to Fly.io
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger deployment on push to the main branch
 
 jobs:
-  simple_deployment_pipeline:
-    runs-on: ubuntu-20.04
+  build-and-deploy:
+    runs-on: ubuntu-latest  # Use an Ubuntu environment
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Set the Node.js version to use (this matches your requirement)
+    
+    - name: Install dependencies
+      run: npm install  # Install the necessary dependencies
+    
+    - name: Build the production version
+      run: npm run build  # Build the project (this assumes the build script is configured in package.json)
+    
+    - name: Install Flyctl
+      run: |
+        curl -L https://fly.io/install.sh | sh  # Install the Fly.io CLI
+        
+    - name: Deploy to Fly.io
+      run: |
+        export FLY_API_TOKEN=${{ secrets.FLY_API_TOKEN }}  # Set the Fly.io API token as an environment variable
+        flyctl auth token $FLY_API_TOKEN  # Authenticate with Fly.io using the token
+        flyctl deploy  # Deploy to Fly.io
 
-      # Set up Node.js (if not already set up)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'  # Choose the appropriate Node.js version
+    - name: View logs
+      run: |
+        flyctl logs --follow  # Follow logs to monitor the deployment process
 
-      # Install dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # Start the app in production mode
-      - name: Start the app
-        run: npm run start-prod &
-
-      # Wait for the server to be ready
-      - name: Wait for server to be ready
-        run: npx wait-on http://localhost:5000
-
-      # E2E tests
-      - name: E2E tests
-        uses: cypress-io/github-action@v5
-        with:
-          command: npm run test:e2e
-          start: npm run start-prod
-          wait-on: http://localhost:8081
