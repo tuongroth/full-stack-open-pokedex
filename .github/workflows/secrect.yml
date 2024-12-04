@@ -1,4 +1,50 @@
+name: CI/CD Pipeline for My App
+
 on:
-  pull_request:
+  push:
     branches:
       - main
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_and_lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js for frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test
+
+      - name: Setup Node.js for backend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install backend dependencies
+        run: npm install
+
+      - name: Run backend tests
+        run: npm test
+
+  deploy:
+    needs: test_and_lint
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Deploy application
+        run: |
+          echo "Deploying application..."
+          # Add your deployment scripts here
