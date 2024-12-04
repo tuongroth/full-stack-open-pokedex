@@ -22,15 +22,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Build the app (if needed, add a build step)
-      - name: Build the app
-        run: npm run build
-
       # Start the app in production mode
       - name: Start the app
         run: npm run start-prod &
-        
-      # Wait for the server to be available
+
+      # Wait for the server to be ready
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:5000
 
