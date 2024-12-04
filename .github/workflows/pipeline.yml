@@ -1,33 +1,35 @@
-name: Deploy to Fly.io
+name: Deployment pipeline
 
 on:
   push:
     branches:
-      - main  # Trigger deployment on push to the main branch
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest  # Use an Ubuntu environment
-    
+  simple_deployment_pipeline:
+    runs-on: ubuntu-20.04
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'  # Set the Node.js version to use (this matches your requirement)
-    
-    - name: Install dependencies
-      run: npm install  # Install the necessary dependencies
-    
-    - name: Build the production version
-      run: npm run build  # Build the project (this assumes the build script is configured in package.json)
-    
-    - name: Install Flyctl
-      run: |
-        curl -L https://fly.io/install.sh | sh  # Install the Fly.io CLI
-        
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # Add linting, testing, and deployment steps here
+
+  tag_release:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          default_bump: patch
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     
 
    
