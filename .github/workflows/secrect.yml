@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for My App
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,42 +9,25 @@ on:
 
 jobs:
   test_and_lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js for frontend
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-
-      - name: Install frontend dependencies
+      - name: Frontend - Install and Test
+        working-directory: ./frontend
         run: |
-          cd frontend
           npm install
-
-      - name: Run frontend tests
-        run: |
-          cd frontend
           npm test
 
-      - name: Setup Node.js for backend
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-
-      - name: Install backend dependencies
-        run: npm install
-
-      - name: Run backend tests
-        run: npm test
+      - name: Backend - Install and Test
+        working-directory: ./
+        run: |
+          npm install
+          npm test
 
   deploy:
     needs: test_and_lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploy application
-        run: |
-          echo "Deploying application..."
-          # Add your deployment scripts here
+      - name: Deploy Application
+        run: echo "Deployment Step (add your script)"
