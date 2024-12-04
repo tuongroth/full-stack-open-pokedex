@@ -1,4 +1,4 @@
-name: Deployment pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,36 +6,25 @@ on:
       - main
 
 jobs:
-  simple_deployment_pipeline:
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Check for #skip in commit messages
-        id: skip_check
-        run: |
-          if git log -1 --pretty=%B | grep -q '#skip'; then
-            echo "::set-output name=skip::true"
-          else
-            echo "::set-output name=skip::false"
-          fi
+        uses: actions/checkout@v2
 
-      - name: Deploy application
-        if: steps.skip_check.outputs.skip == 'false'
-        run: echo "Deploying application"
+      - name: Run build
+        run: npm install && npm run build
 
-  tag_release:
-    needs: [simple_deployment_pipeline]
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@1.64.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Notify Discord of success
+        if: success()
+        uses: discord-webhook-notify@v1.0.0
         with:
-          default_bump: patch
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.skip_check.outputs.skip == 'false' }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          message: "Deployment succeeded! 🎉"
+
+      - name: Notify Discord of failure
+        if: failure()
+        uses: discord-webhook-notify@v1.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          message: "Deployment failed! 🚨 Please check the logs for more details."
